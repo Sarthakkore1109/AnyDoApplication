@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.logging.Logger;
 
@@ -70,8 +73,11 @@ public class LoginActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
                                 loader.dismiss();
-                                Intent intent = new Intent(LoginActivity.this, ToDoActivity.class);
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
+
+                                getUserId();
+
                                 finish();
                             }else{
                                 loader.dismiss();
@@ -88,6 +94,21 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    public void getUserId(){
+        FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser() ;
+        String userId = "";
 
+        userId = currentFirebaseUser.getUid();
+        storeData(userId);
+        Toast.makeText(this, "" + currentFirebaseUser.getUid(), Toast.LENGTH_SHORT).show();
+    }
+
+    public void storeData(String userID){
+        SharedPreferences.Editor editor = getSharedPreferences("AnyDoApplication", MODE_PRIVATE).edit();
+        editor.putString("UserID", userID.toString() );
+        editor.apply();
+        Toast.makeText(this, "" + userID, Toast.LENGTH_SHORT).show();
+        Log.e("TAG", "storeData: StoredSuccesfully" );
+    }
 
 }
